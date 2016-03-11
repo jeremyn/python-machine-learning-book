@@ -33,7 +33,7 @@ if __name__ == '__main__':
     iris_data = datasets.load_iris()
     y = iris_data['target'][0:100]
     y = np.where(y == 0, -1, 1)
-    X = iris_data['data'][:, [0, 2]]
+    X = iris_data['data'][0:100][:, [0, 2]]
     plt.scatter(
         X[:50, 0],
         X[:50, 1],
