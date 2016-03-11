@@ -126,6 +126,22 @@ def plot_adalinegd_results(X, y):
     plt.show()
 
 
+def plot_adalinesgd_results(X_std, y):
+    ada = AdalineSGD(eta=0.01, n_iter=15).fit(X_std, y)
+
+    plot_decision_regions(X_std, y, classifier=ada)
+    plt.title('Adaline - Stochastic Gradient Descent')
+    plt.xlabel('sepal length [standardized]')
+    plt.ylabel('petal length [standardized]')
+    plt.legend(loc='upper left')
+    plt.show()
+
+    plt.plot(range(1, len(ada.cost_) + 1), ada.cost_, marker='o')
+    plt.xlabel('Epochs')
+    plt.ylabel('Average Cost')
+    plt.show()
+
+
 def plot_adalinegd_standardized_results(X_std, y):
     ada = AdalineGD(eta=0.01, n_iter=15).fit(X_std, y)
     plot_decision_regions(X_std, y, classifier=ada)
@@ -188,4 +204,5 @@ if __name__ == '__main__':
     X_std[:, 0] = (X[:, 0] - X[:, 0].mean()) / X[:, 0].std()
     X_std[:, 1] = (X[:, 1] - X[:, 1].mean()) / X[:, 1].std()
 
-    plot_adalinegd_standardized_results(X_std, y)
+    # plot_adalinegd_standardized_results(X_std, y)
+    plot_adalinesgd_results(X_std, y)
