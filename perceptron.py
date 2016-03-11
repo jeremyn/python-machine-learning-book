@@ -140,20 +140,25 @@ def plot_adalinegd_results(X, y):
     plt.show()
 
 
-def plot_adalinesgd_results(X_std, y):
-    ada = AdalineSGD(eta=0.01, n_iter=15).fit(X_std, y)
+def plot_adalinesgd_results(X_std, y, clf=None, label=None, show_cost=True):
+    if clf is None:
+        clf = AdalineSGD(eta=0.01, n_iter=15).fit(X_std, y)
 
-    plot_decision_regions(X_std, y, classifier=ada)
-    plt.title('Adaline - Stochastic Gradient Descent')
+    plot_decision_regions(X_std, y, classifier=clf)
+    title = "Adaline - Stochastic Gradient Descent%(label)s" % {
+        'label': '' if label is None else (" - %s" % label),
+    }
+    plt.title(title)
     plt.xlabel('sepal length [standardized]')
     plt.ylabel('petal length [standardized]')
     plt.legend(loc='upper left')
     plt.show()
 
-    plt.plot(range(1, len(ada.cost_) + 1), ada.cost_, marker='o')
-    plt.xlabel('Epochs')
-    plt.ylabel('Average Cost')
-    plt.show()
+    if show_cost:
+        plt.plot(range(1, len(clf.cost_) + 1), clf.cost_, marker='o')
+        plt.xlabel('Epochs')
+        plt.ylabel('Average Cost')
+        plt.show()
 
 
 def plot_adalinegd_standardized_results(X_std, y):
