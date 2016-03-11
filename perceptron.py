@@ -31,6 +31,21 @@ class Perceptron(object):
         return np.where(self.net_input(X) >= 0.0, 1, -1)
 
 
+def plot_perceptron_results(X, y):
+    ppn = Perceptron(eta=0.1, n_iter=10)
+    ppn.fit(X, y)
+    plt.plot(range(1, len(ppn.errors_) + 1), ppn.errors_, marker='o')
+    plt.xlabel('Epochs')
+    plt.ylabel('Number of misclassifications')
+    plt.show()
+
+    plot_decision_regions(X, y, classifier=ppn)
+    plt.xlabel('sepal length [cm]')
+    plt.ylabel('petal length [cm]')
+    plt.legend(loc='upper left')
+    plt.show()
+
+
 if __name__ == '__main__':
     iris_data = datasets.load_iris()
     y = iris_data['target'][0:100]
@@ -55,15 +70,4 @@ if __name__ == '__main__':
     plt.legend(loc='upper left')
     plt.show()
 
-    ppn = Perceptron(eta=0.1, n_iter=10)
-    ppn.fit(X, y)
-    plt.plot(range(1, len(ppn.errors_) + 1), ppn.errors_, marker='o')
-    plt.xlabel('Epochs')
-    plt.ylabel('Number of misclassifications')
-    plt.show()
-
-    plot_decision_regions(X, y, classifier=ppn)
-    plt.xlabel('sepal length [cm]')
-    plt.ylabel('petal length [cm]')
-    plt.legend(loc='upper left')
-    plt.show()
+    plot_perceptron_results(X, y)
