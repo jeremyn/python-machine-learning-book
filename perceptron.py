@@ -51,3 +51,10 @@ if __name__ == '__main__':
     plt.ylabel('sepal length')
     plt.legend(loc='upper left')
     plt.show()
+
+    ppn = Perceptron(eta=0.1, n_iter=10)
+    ppn.fit(X, y)
+    plt.plot(range(1, len(ppn.errors_) + 1), ppn.errors_, marker='o')
+    plt.xlabel('Epochs')
+    plt.ylabel('Number of misclassifications')
+    plt.show()
