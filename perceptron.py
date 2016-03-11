@@ -78,6 +78,22 @@ def plot_adalinegd_results(X, y):
     plt.show()
 
 
+def plot_adalinegd_standardized_results(X_std, y):
+    ada = AdalineGD(eta=0.01, n_iter=15).fit(X_std, y)
+    plot_decision_regions(X_std, y, classifier=ada)
+    plt.title('Adaline - Gradient Descent')
+    plt.xlabel('sepal length [standardized]')
+    plt.ylabel('petal length [standardized]')
+    plt.legend(loc='upper left')
+    plt.show()
+
+    plt.plot(range(1, len(ada.cost_) + 1), ada.cost_, marker='o')
+    plt.xlabel('Epochs')
+    plt.ylabel('Sum-squared-error')
+
+    plt.show()
+
+
 def plot_perceptron_results(X, y):
     ppn = Perceptron(eta=0.1, n_iter=10)
     ppn.fit(X, y)
@@ -117,9 +133,11 @@ if __name__ == '__main__':
     plt.legend(loc='upper left')
     plt.show()
 
-    #plot_perceptron_results(X, y)
-    plot_adalinegd_results(X, y)
+    # plot_perceptron_results(X, y)
+    # plot_adalinegd_results(X, y)
 
     X_std = np.copy(X)
     X_std[:, 0] = (X[:, 0] - X[:, 0].mean()) / X[:, 0].std()
     X_std[:, 1] = (X[:, 1] - X[:, 1].mean()) / X[:, 1].std()
+
+    plot_adalinegd_standardized_results(X_std, y)
