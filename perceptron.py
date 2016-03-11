@@ -55,6 +55,20 @@ class AdalineSGD(object):
             self.cost_.append(avg_cost)
         return self
 
+    def partial_fit(self, X, y):
+        if not self.w_initialized:
+            if len(X.shape) == 1:
+                m = X.shape[0]
+            else:
+                m = X.shape[1]
+            self._initialize_weights(m)
+        if y.ravel().shape[0] > 1:
+            for x_i, target in zip(X, y):
+                self._update_weights(x_i, target)
+        else:
+            self._update_weights(X, y)
+        return self
+
     @staticmethod
     def _shuffle(X, y):
         r = np.random.permutation(len(y))
