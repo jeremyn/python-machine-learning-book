@@ -112,8 +112,8 @@ if __name__ == '__main__':
         marker='x',
         label='versicolor',
     )
-    plt.xlabel('petal length')
-    plt.ylabel('sepal length')
+    plt.xlabel('sepal length [cm]')
+    plt.ylabel('petal length [cm]')
     plt.legend(loc='upper left')
     plt.show()
 
