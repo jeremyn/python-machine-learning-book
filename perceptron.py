@@ -177,6 +177,27 @@ def plot_adalinegd_standardized_results(X_std, y):
     plt.show()
 
 
+def plot_iris_data(X, y):
+    plt.scatter(
+        X[:50, 0],
+        X[:50, 1],
+        color='red',
+        marker='o',
+        label='setosa',
+    )
+    plt.scatter(
+        X[50:100, 0],
+        X[50:100, 1],
+        color='blue',
+        marker='x',
+        label='versicolor',
+    )
+    plt.xlabel('sepal length [cm]')
+    plt.ylabel('petal length [cm]')
+    plt.legend(loc='upper left')
+    plt.show()
+
+
 def plot_perceptron_results(X, y):
     ppn = Perceptron(eta=0.1, n_iter=10)
     ppn.fit(X, y)
@@ -197,24 +218,8 @@ if __name__ == '__main__':
     y = iris_data['target'][0:100]
     y = np.where(y == 0, -1, 1)
     X = iris_data['data'][0:100][:, [0, 2]]
-    plt.scatter(
-        X[:50, 0],
-        X[:50, 1],
-        color='red',
-        marker='o',
-        label='setosa',
-    )
-    plt.scatter(
-        X[50:100, 0],
-        X[50:100, 1],
-        color='blue',
-        marker='x',
-        label='versicolor',
-    )
-    plt.xlabel('sepal length [cm]')
-    plt.ylabel('petal length [cm]')
-    plt.legend(loc='upper left')
-    plt.show()
+
+    plot_iris_data(X, y)
 
     # plot_perceptron_results(X, y)
     # plot_adalinegd_results(X, y)
