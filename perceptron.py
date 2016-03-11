@@ -1,4 +1,6 @@
+import matplotlib.pyplot as plt
 import numpy as np
+from sklearn import datasets
 
 
 class Perceptron(object):
@@ -24,3 +26,28 @@ class Perceptron(object):
 
     def predict(self, X):
         return np.where(self.net_input(X) >= 0.0, 1, -1)
+
+
+if __name__ == '__main__':
+    iris_data = datasets.load_iris()
+    y = iris_data['target'][0:100]
+    y = np.where(y == 0, -1, 1)
+    X = iris_data['data'][:, [0, 2]]
+    plt.scatter(
+        X[:50, 0],
+        X[:50, 1],
+        color='red',
+        marker='o',
+        label='setosa',
+    )
+    plt.scatter(
+        X[50:100, 0],
+        X[50:100, 1],
+        color='blue',
+        marker='x',
+        label='versicolor',
+    )
+    plt.xlabel('petal length')
+    plt.ylabel('sepal length')
+    plt.legend(loc='upper left')
+    plt.show()
