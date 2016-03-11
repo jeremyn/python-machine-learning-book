@@ -205,4 +205,6 @@ if __name__ == '__main__':
     X_std[:, 1] = (X[:, 1] - X[:, 1].mean()) / X[:, 1].std()
 
     # plot_adalinegd_standardized_results(X_std, y)
+
+    np.random.seed(1)
     plot_adalinesgd_results(X_std, y)
