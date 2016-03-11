@@ -226,4 +226,42 @@ if __name__ == '__main__':
     # plot_adalinegd_standardized_results(X_std, y)
 
     np.random.seed(1)
-    plot_adalinesgd_results(X_std, y)
+    # plot_adalinesgd_results(X_std, y)
+
+    ada_no_online = AdalineSGD(eta=0.01, n_iter=1).fit(X_std, y)
+    plot_adalinesgd_results(
+        X_std,
+        y,
+        ada_no_online,
+        label='No Online',
+        show_cost=False,
+    )
+
+    starting_indexes = np.random.permutation(len(y))[:50]
+    ada_some_online = AdalineSGD(eta=0.01, n_iter=1).fit(
+        X_std[starting_indexes],
+        y[starting_indexes],
+    )
+    for index in range(len(y)):
+        if index not in starting_indexes:
+            x_i = X_std[index]
+            target = y[index]
+            ada_some_online = ada_some_online.partial_fit(x_i, target)
+    plot_adalinesgd_results(
+        X_std,
+        y,
+        ada_some_online,
+        label='Some Online',
+        show_cost=False,
+    )
+
+    ada_all_online = AdalineSGD(eta=0.01)
+    for x_i, target in zip(X_std, y):
+        ada_all_online = ada_all_online.partial_fit(x_i, target)
+    plot_adalinesgd_results(
+        X_std,
+        y,
+        ada_all_online,
+        label='All Online',
+        show_cost=False,
+    )
