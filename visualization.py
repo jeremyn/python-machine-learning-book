@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def plot_decision_regions(X, y, classifier, resolution=0.02):
+def plot_decision_regions(X, y, classifier, resolution=0.02, test_index=None):
     markers = ('s', 'x', 'o', '^', 'v')
     colors = ('red', 'blue', 'lightgreen', 'gray', 'cyan')
     cmap = ListedColormap(colors[:len(np.unique(y))])
@@ -33,4 +33,17 @@ def plot_decision_regions(X, y, classifier, resolution=0.02):
             c=cmap(index),
             marker=markers[index],
             label=class_,
+        )
+
+    if test_index is not None:
+        X_test = X[test_index, :]
+        plt.scatter(
+            X_test[:, 0],
+            X_test[:, 1],
+            s=55,
+            c='',
+            marker='o',
+            alpha=1.0,
+            linewidths=1,
+            label='test set',
         )
