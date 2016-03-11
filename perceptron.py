@@ -34,6 +34,54 @@ class AdalineGD(object):
         return np.where(self.activation(X) >= 0.0, 1, -1)
 
 
+class AdalineSGD(object):
+
+    def __init__(self, eta=0.01, n_iter=10, shuffle=True):
+        self.eta = eta
+        self.n_iter = n_iter
+        self.w_initialized = False
+        self.shuffle = shuffle
+
+    def fit(self, X, y):
+        self._initialize_weights(X.shape[1])
+        self.cost_ = []
+        for _ in range(self.n_iter):
+            if self.shuffle:
+                X, y = self._shuffle(X, y)
+            cost = []
+            for x_i, target in zip(X, y):
+                cost.append(self._update_weights(x_i, target))
+            avg_cost = sum(cost)/len(y)
+            self.cost_.append(avg_cost)
+        return self
+
+    @staticmethod
+    def _shuffle(X, y):
+        r = np.random.permutation(len(y))
+        return X[r], y[r]
+
+    def _initialize_weights(self, m):
+        self.w_ = np.zeros(1+m)
+        self.w_initialized = True
+
+    def _update_weights(self, x_i, target):
+        output = self.net_input(x_i)
+        error = target - output
+        self.w_[1:] += self.eta * x_i.dot(error)
+        self.w_[0] += self.eta * error
+        cost = 0.5 * error**2
+        return cost
+
+    def net_input(self, X):
+        return np.dot(X, self.w_[1:]) + self.w_[0]
+
+    def activation(self, X):
+        return self.net_input(X)
+
+    def predict(self, X):
+        return np.where(self.activation(X) >= 0.0, 1, -1)
+
+
 class Perceptron(object):
 
     def __init__(self, eta=0.01, n_iter=10):
