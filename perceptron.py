@@ -2,6 +2,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from sklearn import datasets
 
+from visualization import plot_decision_regions
+
 
 class Perceptron(object):
 
@@ -58,4 +60,10 @@ if __name__ == '__main__':
     plt.plot(range(1, len(ppn.errors_) + 1), ppn.errors_, marker='o')
     plt.xlabel('Epochs')
     plt.ylabel('Number of misclassifications')
+    plt.show()
+
+    plot_decision_regions(X, y, classifier=ppn)
+    plt.xlabel('sepal length [cm]')
+    plt.ylabel('petal length [cm]')
+    plt.legend(loc='upper left')
     plt.show()
