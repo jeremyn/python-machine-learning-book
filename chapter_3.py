@@ -126,8 +126,10 @@ if __name__ == '__main__':
     # clf = Perceptron(n_iter=40, eta0=0.1, random_state=0)
     # clf = LogisticRegression(C=1000.0, random_state=0)
     # clf = SVC(kernel='linear', C=1.0, random_state=0)
-    # plot_iris_with_classifier(clf)
+    # clf = SVC(kernel='rbf', random_state=0, gamma=0.2, C=1.0)
+    clf = SVC(kernel='rbf', random_state=0, gamma=100.0, C=1.0)
+    plot_iris_with_classifier(clf)
 
     # plot_sigmoid()
     # plot_lr_regularization()
-    plot_xor()
+    # plot_xor()
