@@ -8,6 +8,28 @@ from sklearn import datasets
 
 from visualization import plot_decision_regions
 
+
+def sigmoid(z):
+    return 1.0 / (1.0 + np.exp(-z))
+
+
+def plot_sigmoid():
+    z = np.arange(-7, 7, 0.1)
+    phi_z = sigmoid(z)
+
+    plt.plot(z, phi_z)
+    plt.axvline(0.0, color='k')
+    plt.ylim(-0.1, 1.1)
+    plt.xlabel('z')
+    plt.ylabel('$\phi (z)$')
+
+    plt.yticks([0.0, 0.5, 1.0])
+    ax = plt.gca()
+    ax.yaxis.grid(True)
+
+    plt.show()
+
+
 if __name__ == '__main__':
     iris = datasets.load_iris()
     X = iris.data[:, [2, 3]]
