@@ -1,7 +1,10 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.cross_validation import train_test_split
-from sklearn.linear_model import Perceptron
+from sklearn.linear_model import (
+    LogisticRegression,
+    Perceptron,
+)
 from sklearn.metrics import accuracy_score
 from sklearn.preprocessing import StandardScaler
 from sklearn import datasets
@@ -72,6 +75,7 @@ def plot_sigmoid():
 
 
 if __name__ == '__main__':
-    clf = Perceptron(n_iter=40, eta0=0.1, random_state=0)
+    #clf = Perceptron(n_iter=40, eta0=0.1, random_state=0)
+    clf = LogisticRegression(C=1000.0, random_state=0)
     plot_iris_with_classifier(clf, print_accuracy=True)
     # plot_sigmoid()
