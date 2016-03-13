@@ -13,6 +13,54 @@ from sklearn import datasets
 from visualization import plot_decision_regions
 
 
+def gini(p):
+    return 2 * p * (1-p)
+
+
+def entropy(p):
+    return -p * np.log2(p) - (1-p) * np.log2(1-p)
+
+
+def error(p):
+    return 1 - max(p, 1-p)
+
+
+def plot_impurity_indexes():
+    probs = np.arange(0.0, 1.0, 0.01)
+    entropies = [entropy(p) if p != 0 else None for p in probs]
+    scaled_entropies = [e * 0.5 if e is not None else None for e in entropies]
+    errors = [error(p) for p in probs]
+
+    plt.figure()
+    ax = plt.subplot(111)
+
+    plots = (
+        (entropies, 'Entropy', '-', 'black'),
+        (scaled_entropies, 'Entropy (scaled)', '-', 'lightgray'),
+        (gini(probs), 'Gini Impurity', '--', 'red'),
+        (errors, 'Misclassification Error', '-.', 'green'),
+    )
+
+    for y, label, linestyle, color in plots:
+        ax.plot(probs, y, label=label, linestyle=linestyle, lw=2, color=color)
+
+    ax.legend(
+        loc='upper center',
+        bbox_to_anchor=(0.5, 1.15),
+        ncol=3,
+        fancybox=True,
+        shadow=False,
+    )
+    ax.axhline(y=0.5, linewidth=1, color='k', linestyle='--')
+    ax.axhline(y=1.0, linewidth=1, color='k', linestyle='--')
+
+    plt.ylim([0, 1.1])
+    plt.xlabel('p(i=1)')
+    plt.ylabel('Impurity Index')
+
+    plt.show()
+
+
 def plot_iris_with_classifier(clf, print_accuracy=False):
     iris = datasets.load_iris()
     X = iris.data[:, [2, 3]]
@@ -127,9 +175,10 @@ if __name__ == '__main__':
     # clf = LogisticRegression(C=1000.0, random_state=0)
     # clf = SVC(kernel='linear', C=1.0, random_state=0)
     # clf = SVC(kernel='rbf', random_state=0, gamma=0.2, C=1.0)
-    clf = SVC(kernel='rbf', random_state=0, gamma=100.0, C=1.0)
-    plot_iris_with_classifier(clf)
+    # clf = SVC(kernel='rbf', random_state=0, gamma=100.0, C=1.0)
+    # plot_iris_with_classifier(clf)
 
     # plot_sigmoid()
     # plot_lr_regularization()
     # plot_xor()
+    plot_impurity_indexes()
