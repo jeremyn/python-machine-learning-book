@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.cross_validation import train_test_split
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import (
     LogisticRegression,
     Perceptron,
@@ -183,7 +184,8 @@ if __name__ == '__main__':
     # clf = SVC(kernel='rbf', random_state=0, gamma=100.0, C=1.0)
     # plot_iris_with_classifier(clf)
 
-    clf = DecisionTreeClassifier(criterion='entropy', max_depth=3, random_state=0)
+    # clf = DecisionTreeClassifier(criterion='entropy', max_depth=3, random_state=0)
+    clf = RandomForestClassifier(criterion='entropy', n_estimators=10, random_state=1, n_jobs=2)
     plot_iris_with_classifier(clf, standardize=False)
 
     # plot_sigmoid()
