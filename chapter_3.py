@@ -7,6 +7,7 @@ from sklearn.linear_model import (
     Perceptron,
 )
 from sklearn.metrics import accuracy_score
+from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
@@ -182,11 +183,12 @@ if __name__ == '__main__':
     # clf = SVC(kernel='linear', C=1.0, random_state=0)
     # clf = SVC(kernel='rbf', random_state=0, gamma=0.2, C=1.0)
     # clf = SVC(kernel='rbf', random_state=0, gamma=100.0, C=1.0)
-    # plot_iris_with_classifier(clf)
+    clf = KNeighborsClassifier(n_neighbors=5, p=2, metric='minkowski')
+    plot_iris_with_classifier(clf)
 
     # clf = DecisionTreeClassifier(criterion='entropy', max_depth=3, random_state=0)
-    clf = RandomForestClassifier(criterion='entropy', n_estimators=10, random_state=1, n_jobs=2)
-    plot_iris_with_classifier(clf, standardize=False)
+    # clf = RandomForestClassifier(criterion='entropy', n_estimators=10, random_state=1, n_jobs=2)
+    # plot_iris_with_classifier(clf, standardize=False)
 
     # plot_sigmoid()
     # plot_lr_regularization()
