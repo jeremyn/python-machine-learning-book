@@ -8,6 +8,7 @@ from sklearn.linear_model import (
 from sklearn.metrics import accuracy_score
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
+from sklearn.tree import DecisionTreeClassifier
 from sklearn import datasets
 
 from visualization import plot_decision_regions
@@ -182,7 +183,10 @@ if __name__ == '__main__':
     # clf = SVC(kernel='rbf', random_state=0, gamma=100.0, C=1.0)
     # plot_iris_with_classifier(clf)
 
+    clf = DecisionTreeClassifier(criterion='entropy', max_depth=3, random_state=0)
+    plot_iris_with_classifier(clf, standardize=False)
+
     # plot_sigmoid()
     # plot_lr_regularization()
     # plot_xor()
-    plot_impurity_indexes()
+    # plot_impurity_indexes()
