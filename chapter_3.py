@@ -61,7 +61,7 @@ def plot_impurity_indexes():
     plt.show()
 
 
-def plot_iris_with_classifier(clf, print_accuracy=False):
+def plot_iris_with_classifier(clf, print_accuracy=False, standardize=True):
     iris = datasets.load_iris()
     X = iris.data[:, [2, 3]]
     y = iris.target
@@ -73,30 +73,34 @@ def plot_iris_with_classifier(clf, print_accuracy=False):
         random_state=0,
     )
 
-    sc = StandardScaler()
-    sc.fit(X_train)
-    X_train_std = sc.transform(X_train)
-    X_test_std = sc.transform(X_test)
+    if standardize:
+        sc = StandardScaler()
+        sc.fit(X_train)
+        X_train = sc.transform(X_train)
+        X_test = sc.transform(X_test)
+        units = 'standardized'
+    else:
+        units = 'cm'
 
-    clf.fit(X_train_std, y_train)
+    clf.fit(X_train, y_train)
 
-    y_pred = clf.predict(X_test_std)
+    y_pred = clf.predict(X_test)
     if print_accuracy:
         print("Misclassified samples: %d" % (y_test != y_pred).sum())
         print("Accuracy: %.2f" % accuracy_score(y_test, y_pred))
 
-    X_combined_std = np.vstack((X_train_std, X_test_std))
+    X_combined = np.vstack((X_train, X_test))
     y_combined = np.hstack((y_train, y_test))
 
     plot_decision_regions(
-        X=X_combined_std,
+        X=X_combined,
         y=y_combined,
         classifier=clf,
         test_index=range(105, 150),
     )
 
-    plt.xlabel('petal length [standardized]')
-    plt.ylabel('petal width [standardized]')
+    plt.xlabel("petal length [%s]" % units)
+    plt.ylabel("petal width [%s]" % units)
     plt.legend(loc='upper left')
 
     plt.show()
