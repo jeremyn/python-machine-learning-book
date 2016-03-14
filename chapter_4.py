@@ -1,11 +1,17 @@
 from io import StringIO
+import os
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from sklearn.cross_validation import train_test_split
+from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import (
     Imputer,
     LabelEncoder,
+    MinMaxScaler,
     OneHotEncoder,
+    StandardScaler,
 )
 
 
@@ -82,6 +88,103 @@ def work_with_numerical_data():
     print(imputed_data)
 
 
+def plot_regularization_path(columns, X, y):
+    fig = plt.figure()
+    ax = plt.subplot(111)
+
+    colors = [
+        'blue', 'green', 'red', 'cyan', 'magenta', 'yellow', 'black', 'pink',
+        'lightgreen', 'lightblue', 'gray', 'indigo', 'orange',
+    ]
+
+    weights = []
+    params = []
+    for c in np.arange(-4, 6):
+        lr = LogisticRegression(penalty='l1', C=10**c, random_state=0)
+        lr.fit(X, y)
+        weights.append(lr.coef_[1])
+        params.append(10**c)
+
+    weights = np.array(weights)
+
+    for column, color in zip(range(weights.shape[1]), colors):
+        plt.plot(
+            params,
+            weights[:, column],
+            label=columns[column+1],
+            color=color,
+        )
+
+    plt.axhline(0, color='black', linestyle='--', linewidth=3)
+    plt.xlim([10**-5, 10**5])
+    plt.ylabel('weight coefficient')
+    plt.xlabel('C')
+    plt.xscale('log')
+    plt.legend(loc='upper left')
+    ax.legend(
+        loc='upper center',
+        bbox_to_anchor=(1.38, 1.03),
+        ncol=1,
+        fancybox=True,
+    )
+    plt.show()
+
+
+def work_with_wine_data():
+    df = pd.read_csv(os.path.join('datasets', 'wine.data'), header=None)
+    df.columns = [
+        'Class label',
+        'Alcohol',
+        'Malic acid',
+        'Ash',
+        'Alcalinity of ash',
+        'Magnesium',
+        'Total phenols',
+        'Flavanoids',
+        'Nonflavanoid phenols',
+        'Proanthocyanins',
+        'Color intensity',
+        'Hue',
+        'OD280/OD315 of diluted wines',
+        'Proline',
+    ]
+    print('Class labels', np.unique(df['Class label']), end='\n\n')
+    print(df.head(), end='\n\n')
+
+    X = df.iloc[:, 1:].values
+    y = df.iloc[:, 0].values
+    X_train, X_test, y_train, y_test = train_test_split(
+        X,
+        y,
+        test_size=0.3,
+        random_state=0,
+    )
+
+    ex = pd.DataFrame([0, 1, 2, 3, 4, 5], dtype=np.float64)
+    ex[1] = StandardScaler().fit_transform(ex)
+    ex[2] = MinMaxScaler().fit_transform(ex[0].reshape(-1, 1))
+    ex.columns = ['input', 'standardized', 'normalized']
+    print(ex, end='\n\n')
+
+    min_max_scaler = MinMaxScaler()
+    X_train_norm = min_max_scaler.fit_transform(X_train)
+    X_test_norm = min_max_scaler.transform(X_test)
+
+    std_scaler = StandardScaler()
+    X_train_std = std_scaler.fit_transform(X_train)
+    X_test_std = std_scaler.transform(X_test)
+
+    lr = LogisticRegression(penalty='l1', C=0.1)
+    lr.fit(X_train_std, y_train)
+    print("Training accuracy: %s" % lr.score(X_train_std, y_train))
+    print("Test accuracy: %s" % lr.score(X_test_std, y_test))
+    print("Intercept: %s" % lr.intercept_)
+    print("Coefficients: %s" % lr.coef_)
+
+    plot_regularization_path(df.columns, X_train_std, y_train)
+
+
 if __name__ == '__main__':
-    #work_with_numerical_data()
-    work_with_categorical_data()
+    # work_with_numerical_data()
+    # work_with_categorical_data()
+    work_with_wine_data()
