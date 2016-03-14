@@ -9,6 +9,7 @@ from sklearn.base import clone
 from sklearn.cross_validation import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
+from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import (
     Imputer,
     LabelEncoder,
@@ -133,6 +134,31 @@ def plot_regularization_path(columns, X, y):
     plt.show()
 
 
+def use_sbs_with_knn(columns, X_train, X_test, y_train, y_test):
+    knn = KNeighborsClassifier(n_neighbors=2)
+    sbs = SBS(knn, k_features=1)
+    sbs.fit(X_train, y_train)
+
+    k_feat = [len(k) for k in sbs.subsets_]
+    plt.plot(k_feat, sbs.scores_, marker='o')
+    plt.ylim([0.7, 1.1])
+    plt.ylabel('Accuracy')
+    plt.xlabel('Number of features')
+    plt.grid()
+    plt.show()
+
+    k5 = list(sbs.subsets_[8])
+    print(columns[1:][k5])
+
+    knn.fit(X_train, y_train)
+    print("Training accuracy: %s" % knn.score(X_train, y_train))
+    print("Test accuracy: %s" % knn.score(X_test, y_test))
+
+    knn.fit(X_train[:, k5], y_train)
+    print("Training accuracy: %s" % knn.score(X_train[:, k5], y_train))
+    print("Test accuracy: %s" % knn.score(X_test[:, k5], y_test))
+
+
 def work_with_wine_data():
     df = pd.read_csv(os.path.join('datasets', 'wine.data'), header=None)
     df.columns = [
@@ -185,6 +211,7 @@ def work_with_wine_data():
     print("Coefficients: %s" % lr.coef_)
 
     plot_regularization_path(df.columns, X_train_std, y_train)
+    use_sbs_with_knn(df.columns, X_train_std, X_test_std, y_train, y_test)
 
 
 class SBS(object):
