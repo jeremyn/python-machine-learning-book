@@ -7,6 +7,8 @@ import numpy as np
 import pandas as pd
 from sklearn.base import clone
 from sklearn.cross_validation import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.feature_selection import SelectFromModel
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
 from sklearn.neighbors import KNeighborsClassifier
@@ -159,6 +161,41 @@ def use_sbs_with_knn(columns, X_train, X_test, y_train, y_test):
     print("Test accuracy: %s" % knn.score(X_test[:, k5], y_test))
 
 
+def plot_feature_importances(columns, X_train, y_train):
+    feat_labels = columns[1:]
+
+    forest = RandomForestClassifier(n_estimators=10000, random_state=0)
+
+    forest.fit(X_train, y_train)
+    importances = forest.feature_importances_
+
+    indices = np.argsort(importances)[::-1]
+
+    for f in range(X_train.shape[1]):
+        print("%2d) %-*s %f" % (
+            f+1,
+            30,
+            feat_labels[indices[f]],
+            importances[indices[f]],
+        ))
+    print()
+
+    plt.title('Feature Importances')
+    plt.bar(
+        range(X_train.shape[1]),
+        importances[indices],
+        color='lightblue',
+        align='center',
+    )
+    plt.xticks(range(X_train.shape[1]), feat_labels[indices], rotation=90)
+    plt.xlim([-1, X_train.shape[1]])
+    plt.show()
+
+    feature_selector = SelectFromModel(forest, threshold=0.15, prefit=True)
+    X_selected = feature_selector.transform(X_train)
+    print(X_selected.shape)
+
+
 def work_with_wine_data():
     df = pd.read_csv(os.path.join('datasets', 'wine.data'), header=None)
     df.columns = [
@@ -210,8 +247,9 @@ def work_with_wine_data():
     print("Intercept: %s" % lr.intercept_)
     print("Coefficients: %s" % lr.coef_)
 
-    plot_regularization_path(df.columns, X_train_std, y_train)
-    use_sbs_with_knn(df.columns, X_train_std, X_test_std, y_train, y_test)
+    # plot_regularization_path(df.columns, X_train_std, y_train)
+    # use_sbs_with_knn(df.columns, X_train_std, X_test_std, y_train, y_test)
+    plot_feature_importances(df.columns, X_train, y_train)
 
 
 class SBS(object):
