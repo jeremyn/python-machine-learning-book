@@ -3,7 +3,8 @@ from io import StringIO
 import pandas as pd
 from sklearn.preprocessing import Imputer
 
-if __name__ == '__main__':
+
+def work_with_numerical_data():
     csv_data = """
         A,B,C,D
         1.0,2.0,3.0,4.0
@@ -24,3 +25,7 @@ if __name__ == '__main__':
     imr = imr.fit(df)
     imputed_data = imr.transform(df.values)
     print(imputed_data)
+
+
+if __name__ == '__main__':
+    work_with_numerical_data()
