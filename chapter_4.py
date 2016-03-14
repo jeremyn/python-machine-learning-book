@@ -1,6 +1,7 @@
 from io import StringIO
 
 import pandas as pd
+from sklearn.preprocessing import Imputer
 
 if __name__ == '__main__':
     csv_data = """
@@ -18,3 +19,8 @@ if __name__ == '__main__':
     print(df.dropna(how='all'), end='\n\n')
     print(df.dropna(thresh=4), end='\n\n')
     print(df.dropna(subset=['C']), end='\n\n')
+
+    imr = Imputer(missing_values='NaN', strategy='mean', axis=0)
+    imr = imr.fit(df)
+    imputed_data = imr.transform(df.values)
+    print(imputed_data)
