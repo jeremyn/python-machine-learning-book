@@ -373,6 +373,60 @@ def plot_pca_for_data(data_type, n_samples):
         plt.show()
 
 
+def project_x(x_new, X, gamma, alphas, lambdas):
+    pair_dist = np.array([np.sum((x_new - row)**2) for row in X])
+    k = np.exp(-gamma * pair_dist)
+    return k.dot(alphas / lambdas)
+
+
+def plot_new_data_with_kernel_pca():
+    X, y = make_moons(n_samples=100, random_state=123)
+    alphas, lambdas = rbf_kernel_pca(X, gamma=15, n_components=1)
+
+    x_new = X[25]
+    print("x_new: %s" % x_new)
+
+    x_proj = alphas[25]
+    print("x_proj: %s" % x_proj)
+
+    x_reproj = project_x(x_new, X, gamma=15, alphas=alphas, lambdas=lambdas)
+    print("x_reproj: %s" % x_reproj)
+
+    plt.scatter(
+        alphas[y == 0, 0],
+        np.zeros(50),
+        color='red',
+        marker='^',
+        alpha=0.5,
+    )
+    plt.scatter(
+        alphas[y == 1, 0],
+        np.zeros(50),
+        color='blue',
+        marker='o',
+        alpha=0.5,
+    )
+    plt.scatter(
+        x_proj,
+        0,
+        color='black',
+        label='original projection of point X[25]',
+        marker='^',
+        s=100,
+    )
+    plt.scatter(
+        x_reproj,
+        0,
+        color='green',
+        label='remapped point X[25]',
+        marker='x',
+        s=500,
+    )
+    plt.legend(scatterpoints=1)
+
+    plt.show()
+
+
 if __name__ == '__main__':
     X_train, X_test, y_train, y_test = get_standardized_wine_data()
     # plot_manual_pca_transformation(X_train, y_train)
@@ -380,4 +434,5 @@ if __name__ == '__main__':
     # plot_manual_lda_transformation(X_train, y_train)
     # plot_sklearn_lda_with_lr(X_train, X_test, y_train, y_test)
     # plot_pca_for_data(data_type='half_circles', n_samples=100)
-    plot_pca_for_data(data_type='concentric_circles', n_samples=1000)
+    # plot_pca_for_data(data_type='concentric_circles', n_samples=1000)
+    plot_new_data_with_kernel_pca()
