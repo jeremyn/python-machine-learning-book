@@ -1,9 +1,17 @@
 import os
 
 import matplotlib.pyplot as plt
+from matplotlib.ticker import FormatStrFormatter
 import numpy as np
 import pandas as pd
+from scipy import exp
+from scipy.linalg import eigh
+from scipy.spatial.distance import (
+    pdist,
+    squareform,
+)
 from sklearn.cross_validation import train_test_split
+from sklearn.datasets import make_moons
 from sklearn.decomposition import PCA
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 from sklearn.linear_model import LogisticRegression
@@ -265,9 +273,96 @@ def get_standardized_wine_data():
 
     return X_train_std, X_test_std, y_train, y_test
 
+
+def rbf_kernel_pca(X, gamma, n_components):
+    sq_dists = pdist(X, 'sqeuclidean')
+    mat_sq_dists = squareform(sq_dists)
+    K = exp(-gamma * mat_sq_dists)
+
+    N = K.shape[0]
+    one_n = np.ones((N, N)) / N
+    K = K - one_n.dot(K) - K.dot(one_n) + one_n.dot(K).dot(one_n)
+
+    eigenvalues, eigenvectors = eigh(K)
+
+    X_pc = np.column_stack((
+        eigenvectors[:, -i] for i in range(1, n_components+1)
+    ))
+
+    return X_pc
+
+
+def plot_pca_for_half_circles():
+    X, y = make_moons(n_samples=100, random_state=123)
+
+    plt.scatter(
+        X[y == 0, 0],
+        X[y == 0, 1],
+        color='red',
+        marker='^',
+        alpha=0.5,
+    )
+    plt.scatter(
+        X[y == 1, 0],
+        X[y == 1, 1],
+        color='blue',
+        marker='o',
+        alpha=0.5,
+    )
+    plt.show()
+
+    X_spca = PCA(n_components=2).fit_transform(X)
+    X_kpca = rbf_kernel_pca(X, gamma=15, n_components=2)
+
+    for index, X_pca in enumerate((X_spca, X_kpca)):
+        fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(7, 3))
+
+        ax[0].scatter(
+            X_pca[y == 0, 0],
+            X_pca[y == 0, 1],
+            color='red',
+            marker='^',
+            alpha=0.5,
+        )
+        ax[0].scatter(
+            X_pca[y == 1, 0],
+            X_pca[y == 1, 1],
+            color='blue',
+            marker='o',
+            alpha=0.5,
+        )
+
+        ax[1].scatter(
+            X_pca[y == 0, 0],
+            np.zeros((50, 1))+0.02,
+            color='red',
+            marker='^',
+            alpha=0.5,
+        )
+        ax[1].scatter(
+            X_pca[y == 1, 0],
+            np.zeros((50, 1))-0.02,
+            color='blue',
+            marker='o',
+            alpha=0.5,
+        )
+
+        ax[0].set_xlabel('PC1')
+        ax[0].set_ylabel('PC2')
+        ax[1].set_ylim([-1, 1])
+        ax[1].set_yticks([])
+        ax[1].set_xlabel('PC1')
+        if index == 1:
+            ax[0].xaxis.set_major_formatter(FormatStrFormatter('%0.1f'))
+            ax[1].xaxis.set_major_formatter(FormatStrFormatter('%0.1f'))
+
+        plt.show()
+
+
 if __name__ == '__main__':
     X_train, X_test, y_train, y_test = get_standardized_wine_data()
     # plot_manual_pca_transformation(X_train, y_train)
     # plot_sklearn_pca_with_lr(X_train, X_test, y_train, y_test)
     # plot_manual_lda_transformation(X_train, y_train)
-    plot_sklearn_lda_with_lr(X_train, X_test, y_train, y_test)
+    # plot_sklearn_lda_with_lr(X_train, X_test, y_train, y_test)
+    plot_pca_for_half_circles()
