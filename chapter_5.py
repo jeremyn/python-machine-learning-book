@@ -288,11 +288,12 @@ def rbf_kernel_pca(X, gamma, n_components):
 
     eigenvalues, eigenvectors = eigh(K)
 
-    X_pc = np.column_stack((
+    alphas = np.column_stack((
         eigenvectors[:, -i] for i in range(1, n_components+1)
     ))
+    lambdas = [eigenvalues[-i] for i in range(1, n_components+1)]
 
-    return X_pc
+    return alphas, lambdas
 
 
 def plot_pca_for_data(data_type, n_samples):
@@ -325,7 +326,7 @@ def plot_pca_for_data(data_type, n_samples):
     plt.show()
 
     X_spca = PCA(n_components=2).fit_transform(X)
-    X_kpca = rbf_kernel_pca(X, gamma=15, n_components=2)
+    X_kpca, _ = rbf_kernel_pca(X, gamma=15, n_components=2)
 
     for index, X_pca in enumerate((X_spca, X_kpca)):
         fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(7, 3))
