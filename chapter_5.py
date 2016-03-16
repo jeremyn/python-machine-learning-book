@@ -11,6 +11,109 @@ from sklearn.preprocessing import StandardScaler
 from visualization import plot_decision_regions
 
 
+def plot_manual_lda_transformation(X, y):
+    np.set_printoptions(precision=4)
+
+    print("Class label distribution: %s" % np.bincount(y)[1:])
+
+    num_features = 13
+    mean_vectors = []
+    for label in range(1, 4):
+        mean_vectors.append(
+            np.mean(X[y == label], axis=0).reshape(num_features, 1)
+        )
+        print("MV %s: %s\n" % (label, mean_vectors[label-1].T))
+    mean_overall = np.mean(X, axis=0).reshape(num_features, 1)
+
+    S_W_unscaled = np.zeros((num_features, num_features))
+    S_W = np.zeros((num_features, num_features))
+    S_B = np.zeros((num_features, num_features))
+    for label, mean_vector in zip(range(1, 4), mean_vectors):
+        class_scatter = np.zeros((num_features, num_features))
+        for row in X[y == label]:
+            row = row.reshape(num_features, 1)
+            class_scatter += (row - mean_vector).dot((row - mean_vector).T)
+        S_W_unscaled += class_scatter
+
+        S_W += np.cov(X[y == label].T)
+
+        n = X[y == label, :].shape[0]
+        S_B += n * (mean_vector - mean_overall).dot(
+            (mean_vector - mean_overall).T
+        )
+
+    print(
+        "Unscaled within-class scatter matrix: %sx%s" %
+        (S_W_unscaled.shape[0], S_W_unscaled.shape[1])
+    )
+    print(
+        "Scaled within-class scatter matrix: %sx%s" %
+        (S_W.shape[0], S_W.shape[1])
+    )
+    print(
+        "Between-class scatter matrix: %sx%s" %
+        (S_B.shape[0], S_B.shape[1])
+    )
+
+    eigenvalues, eigenvectors = np.linalg.eig(np.linalg.inv(S_W).dot(S_B))
+    eigenpairs = [
+        (np.abs(eigenvalue), eigenvectors[:, index])
+        for index, eigenvalue
+        in enumerate(eigenvalues)
+    ]
+    eigenpairs = sorted(eigenpairs, key=lambda k: k[0], reverse=True)
+
+    print("Eigenvalues in decreasing order: \n")
+    for eigenpair in eigenpairs:
+        print(eigenpair[0])
+
+    tot = sum(eigenvalues.real)
+    discr = [i/tot for i in map(lambda p: p[0], eigenpairs)]
+    cum_discr = np.cumsum(discr)
+
+    plt.bar(
+        range(1, 14),
+        discr,
+        alpha=0.5,
+        align='center',
+        label='individual "discriminability"',
+    )
+    plt.step(
+        range(1, 14),
+        cum_discr,
+        where='mid',
+        label='cumulative "discriminability"',
+    )
+    plt.ylabel('"discriminability" ratio')
+    plt.xlabel('Linear Discriminants')
+    plt.ylim([-0.1, 1.1])
+    plt.legend(loc='best')
+    plt.show()
+
+    w = np.hstack((
+        eigenpairs[0][1][:, np.newaxis].real,
+        eigenpairs[1][1][:, np.newaxis].real,
+    ))
+    print('Matrix W:\n', w)
+
+    X_lda = X.dot(w)
+    colors = ['r', 'b', 'g']
+    markers = ['s', 'x', 'o']
+    for label, color, marker in zip(np.unique(y), colors, markers):
+        plt.scatter(
+            X_lda[y == label, 0],
+            X_lda[y == label, 1],
+            c=color,
+            label=label,
+            marker=marker,
+        )
+
+    plt.xlabel('LD 1')
+    plt.ylabel('LD 2')
+    plt.legend(loc='upper right')
+    plt.show()
+
+
 def plot_manual_pca_transformation(X, y):
     cov_mat = np.cov(X.T)
     eigenvalues, eigenvectors = np.linalg.eig(cov_mat)
@@ -142,4 +245,5 @@ def get_standardized_wine_data():
 if __name__ == '__main__':
     X_train, X_test, y_train, y_test = get_standardized_wine_data()
     # plot_manual_pca_transformation(X_train, y_train)
-    plot_sklearn_pca_with_lr(X_train, X_test, y_train, y_test)
+    # plot_sklearn_pca_with_lr(X_train, X_test, y_train, y_test)
+    plot_manual_lda_transformation(X_train, y_train)
