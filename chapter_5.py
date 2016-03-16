@@ -11,7 +11,10 @@ from scipy.spatial.distance import (
     squareform,
 )
 from sklearn.cross_validation import train_test_split
-from sklearn.datasets import make_moons
+from sklearn.datasets import (
+    make_circles,
+    make_moons,
+)
 from sklearn.decomposition import PCA
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 from sklearn.linear_model import LogisticRegression
@@ -292,8 +295,18 @@ def rbf_kernel_pca(X, gamma, n_components):
     return X_pc
 
 
-def plot_pca_for_half_circles():
-    X, y = make_moons(n_samples=100, random_state=123)
+def plot_pca_for_data(data_type, n_samples):
+    if data_type == 'half_circles':
+        X, y = make_moons(n_samples=n_samples, random_state=123)
+        format_x_axis = True
+    elif data_type == 'concentric_circles':
+        X, y = make_circles(
+            n_samples=n_samples,
+            random_state=123,
+            noise=0.1,
+            factor=0.2,
+        )
+        format_x_axis = False
 
     plt.scatter(
         X[y == 0, 0],
@@ -334,14 +347,14 @@ def plot_pca_for_half_circles():
 
         ax[1].scatter(
             X_pca[y == 0, 0],
-            np.zeros((50, 1))+0.02,
+            np.zeros((n_samples/2, 1))+0.02,
             color='red',
             marker='^',
             alpha=0.5,
         )
         ax[1].scatter(
             X_pca[y == 1, 0],
-            np.zeros((50, 1))-0.02,
+            np.zeros((n_samples/2, 1))-0.02,
             color='blue',
             marker='o',
             alpha=0.5,
@@ -352,7 +365,7 @@ def plot_pca_for_half_circles():
         ax[1].set_ylim([-1, 1])
         ax[1].set_yticks([])
         ax[1].set_xlabel('PC1')
-        if index == 1:
+        if format_x_axis and (index == 1):
             ax[0].xaxis.set_major_formatter(FormatStrFormatter('%0.1f'))
             ax[1].xaxis.set_major_formatter(FormatStrFormatter('%0.1f'))
 
@@ -365,4 +378,5 @@ if __name__ == '__main__':
     # plot_sklearn_pca_with_lr(X_train, X_test, y_train, y_test)
     # plot_manual_lda_transformation(X_train, y_train)
     # plot_sklearn_lda_with_lr(X_train, X_test, y_train, y_test)
-    plot_pca_for_half_circles()
+    # plot_pca_for_data(data_type='half_circles', n_samples=100)
+    plot_pca_for_data(data_type='concentric_circles', n_samples=1000)
