@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 from sklearn.cross_validation import train_test_split
 from sklearn.decomposition import PCA
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
 
@@ -111,6 +112,28 @@ def plot_manual_lda_transformation(X, y):
     plt.xlabel('LD 1')
     plt.ylabel('LD 2')
     plt.legend(loc='upper right')
+    plt.show()
+
+
+def plot_sklearn_lda_with_lr(X_train, X_test, y_train, y_test):
+    lda = LDA(n_components=2)
+    X_train_lda = lda.fit_transform(X_train, y_train)
+
+    lr = LogisticRegression()
+    lr = lr.fit(X_train_lda, y_train)
+
+    plot_decision_regions(X_train_lda, y_train, classifier=lr)
+    plt.xlabel('LD 1')
+    plt.ylabel('LD 2')
+    plt.legend(loc='lower left')
+    plt.show()
+
+    X_test_lda = lda.transform(X_test)
+
+    plot_decision_regions(X_test_lda, y_test, classifier=lr)
+    plt.xlabel('LD 1')
+    plt.ylabel('LD 2')
+    plt.legend(loc='lower left')
     plt.show()
 
 
@@ -246,4 +269,5 @@ if __name__ == '__main__':
     X_train, X_test, y_train, y_test = get_standardized_wine_data()
     # plot_manual_pca_transformation(X_train, y_train)
     # plot_sklearn_pca_with_lr(X_train, X_test, y_train, y_test)
-    plot_manual_lda_transformation(X_train, y_train)
+    # plot_manual_lda_transformation(X_train, y_train)
+    plot_sklearn_lda_with_lr(X_train, X_test, y_train, y_test)
