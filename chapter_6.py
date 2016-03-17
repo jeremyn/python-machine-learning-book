@@ -9,6 +9,7 @@ from sklearn.cross_validation import (
     train_test_split,
 )
 from sklearn.decomposition import PCA
+from sklearn.grid_search import GridSearchCV
 from sklearn.learning_curve import (
     learning_curve,
     validation_curve,
@@ -19,6 +20,8 @@ from sklearn.preprocessing import (
     LabelEncoder,
     StandardScaler,
 )
+from sklearn.svm import SVC
+from sklearn.tree import DecisionTreeClassifier
 
 
 def get_wdbc_data():
@@ -193,8 +196,67 @@ def use_kfold_cross_validation(X_train, X_test, y_train, y_test):
     )
 
 
+def work_with_grid_search(X_train, X_test, y_train, y_test):
+    pipe_svc = Pipeline([
+        ('scl', StandardScaler()),
+        ('clf', SVC(random_state=1)),
+    ])
+
+    param_range = np.logspace(-4, 3, num=8)
+    param_grid = [
+        {
+            'clf__C': param_range,
+            'clf__kernel': ['linear'],
+        },
+        {
+            'clf__C': param_range,
+            'clf__gamma': param_range,
+            'clf__kernel': ['rbf'],
+        },
+    ]
+
+    gs = GridSearchCV(
+        estimator=pipe_svc,
+        param_grid=param_grid,
+        scoring='accuracy',
+        cv=10,
+    )
+    gs = gs.fit(X_train, y_train)
+    print("gs.best_score_: %s" % gs.best_score_)
+    print("gs.best_params_: %s" % gs.best_params_)
+
+    clf = gs.best_estimator_
+    clf.fit(X_train, y_train)
+    print("Test accuracy: %.3f" % clf.score(X_test, y_test))
+
+    gs = GridSearchCV(
+        estimator=pipe_svc,
+        param_grid=param_grid,
+        scoring='accuracy',
+        cv=5,
+    )
+    scores = cross_val_score(gs, X_train, y_train, scoring='accuracy', cv=5)
+    print(
+        "\nSVM nested cross-validation accuracy: %.3f +/- %.3f" %
+        (np.mean(scores), np.std(scores)),
+    )
+
+    gs = GridSearchCV(
+        estimator=DecisionTreeClassifier(random_state=0),
+        param_grid=[{'max_depth': [1, 2, 3, 4, 5, 6, 7, None]}],
+        scoring='accuracy',
+        cv=5,
+    )
+    scores = cross_val_score(gs, X_train, y_train, scoring='accuracy', cv=5)
+    print(
+        "\nDecision tree nested cross-validation accuracy: %.3f +/- %.3f" %
+        (np.mean(scores), np.std(scores)),
+    )
+
+
 if __name__ == '__main__':
     X_train, X_test, y_train, y_test = get_wdbc_data()
     # use_kfold_cross_validation(X_train, X_test, y_train, y_test)
     # plot_learning_curve(X_train, y_train)
-    plot_validation_curve(X_train, y_train)
+    # plot_validation_curve(X_train, y_train)
+    work_with_grid_search(X_train, X_test, y_train, y_test)
