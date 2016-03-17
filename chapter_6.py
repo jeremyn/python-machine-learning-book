@@ -31,9 +31,7 @@ def get_wdbc_data():
     return X_train, X_test, y_train, y_test
 
 
-if __name__ == '__main__':
-    X_train, X_test, y_train, y_test = get_wdbc_data()
-
+def use_kfold_cross_validation(X_train, X_test, y_train, y_test):
     pipe_lr = Pipeline([
         ('scl', StandardScaler()),
         ('pca', PCA(n_components=2)),
@@ -63,3 +61,8 @@ if __name__ == '__main__':
         "cross_val_score CV accuracy: %.3f +/- %.3f" %
         (np.mean(scores), np.std(scores))
     )
+
+
+if __name__ == '__main__':
+    X_train, X_test, y_train, y_test = get_wdbc_data()
+    use_kfold_cross_validation(X_train, X_test, y_train, y_test)
