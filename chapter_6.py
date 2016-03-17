@@ -15,6 +15,13 @@ from sklearn.learning_curve import (
     validation_curve,
 )
 from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import (
+    confusion_matrix,
+    f1_score,
+    make_scorer,
+    precision_score,
+    recall_score,
+)
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import (
     LabelEncoder,
@@ -254,9 +261,64 @@ def work_with_grid_search(X_train, X_test, y_train, y_test):
     )
 
 
+def work_with_metrics(X_train, X_test, y_train, y_test):
+    pipe_svc = Pipeline([
+        ('scl', StandardScaler()),
+        ('clf', SVC(random_state=1)),
+    ])
+    pipe_svc.fit(X_train, y_train)
+    y_pred = pipe_svc.predict(X_test)
+    confmat = confusion_matrix(y_true=y_test, y_pred=y_pred)
+    print('default confusion matrix:\n', confmat)
+    print(
+        'reversed confusion matrix:\n',
+        confusion_matrix(y_true=y_test, y_pred=y_pred, labels=[1, 0]),
+    )
+
+    fig, ax = plt.subplots(figsize=(2.5, 2.5))
+    ax.matshow(confmat, cmap=plt.cm.Blues, alpha=0.3)
+    for i in range(confmat.shape[0]):
+        for j in range(confmat.shape[1]):
+            ax.text(x=j, y=i, s=confmat[i, j], va='center', ha='center')
+
+    plt.xlabel('predicted label')
+    plt.ylabel('true label')
+
+    plt.show()
+
+    print("Precision: %.3f" % precision_score(y_true=y_test, y_pred=y_pred))
+    print("Recall: %.3f" % recall_score(y_true=y_test, y_pred=y_pred))
+    print("F1: %.3f" % f1_score(y_true=y_test, y_pred=y_pred))
+
+    scorer = make_scorer(f1_score, pos_label=0)
+    c_gamma_range = np.logspace(-2, 1, num=4)
+    param_grid = [
+        {
+            'clf__C': c_gamma_range,
+            'clf__kernel': ['linear'],
+        },
+        {
+            'clf__C': c_gamma_range,
+            'clf__gamma': c_gamma_range,
+            'clf__kernel': ['rbf'],
+        },
+    ]
+
+    gs = GridSearchCV(
+        estimator=pipe_svc,
+        param_grid=param_grid,
+        scoring=scorer,
+        cv=10,
+    )
+    gs.fit(X_train, y_train)
+    print("gs.best_score_: %s" % gs.best_score_)
+    print("gs.best_params_: %s" % gs.best_params_)
+
+
 if __name__ == '__main__':
     X_train, X_test, y_train, y_test = get_wdbc_data()
     # use_kfold_cross_validation(X_train, X_test, y_train, y_test)
     # plot_learning_curve(X_train, y_train)
     # plot_validation_curve(X_train, y_train)
-    work_with_grid_search(X_train, X_test, y_train, y_test)
+    # work_with_grid_search(X_train, X_test, y_train, y_test)
+    work_with_metrics(X_train, X_test, y_train, y_test)
