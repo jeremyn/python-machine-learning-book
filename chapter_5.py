@@ -15,7 +15,10 @@ from sklearn.datasets import (
     make_circles,
     make_moons,
 )
-from sklearn.decomposition import PCA
+from sklearn.decomposition import (
+    KernelPCA,
+    PCA,
+)
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
@@ -327,8 +330,13 @@ def plot_pca_for_data(data_type, n_samples):
 
     X_spca = PCA(n_components=2).fit_transform(X)
     X_kpca, _ = rbf_kernel_pca(X, gamma=15, n_components=2)
+    X_skernpca = KernelPCA(
+        n_components=2,
+        kernel='rbf',
+        gamma=15,
+    ).fit_transform(X)
 
-    for index, X_pca in enumerate((X_spca, X_kpca)):
+    for index, X_pca in enumerate((X_spca, X_kpca, X_skernpca)):
         fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(7, 3))
 
         ax[0].scatter(
@@ -433,6 +441,6 @@ if __name__ == '__main__':
     # plot_sklearn_pca_with_lr(X_train, X_test, y_train, y_test)
     # plot_manual_lda_transformation(X_train, y_train)
     # plot_sklearn_lda_with_lr(X_train, X_test, y_train, y_test)
-    # plot_pca_for_data(data_type='half_circles', n_samples=100)
+    plot_pca_for_data(data_type='half_circles', n_samples=100)
     # plot_pca_for_data(data_type='concentric_circles', n_samples=1000)
-    plot_new_data_with_kernel_pca()
+    # plot_new_data_with_kernel_pca()
