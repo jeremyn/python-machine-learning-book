@@ -3,6 +3,7 @@ import os
 import numpy as np
 import pandas as pd
 from sklearn.cross_validation import (
+    cross_val_score,
     StratifiedKFold,
     train_test_split,
 )
@@ -51,4 +52,14 @@ if __name__ == '__main__':
             "Fold: %s, Class dist.: %s, Acc: %.3f" %
             (k+1, np.bincount(y_train[train]), score)
         )
-    print("\nCV accuracy: %.3f +/- %.3f" % (np.mean(scores), np.std(scores)))
+    print(
+        "\nCustom CV accuracy: %.3f +/- %.3f\n" %
+        (np.mean(scores), np.std(scores)),
+    )
+
+    scores = cross_val_score(estimator=pipe_lr, X=X_train, y=y_train, cv=10)
+    print("cross_val_score CV accuracy scores: %s" % scores)
+    print(
+        "cross_val_score CV accuracy: %.3f +/- %.3f" %
+        (np.mean(scores), np.std(scores))
+    )
