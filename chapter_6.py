@@ -1,7 +1,11 @@
 import os
 
+import numpy as np
 import pandas as pd
-from sklearn.cross_validation import train_test_split
+from sklearn.cross_validation import (
+    StratifiedKFold,
+    train_test_split,
+)
 from sklearn.decomposition import PCA
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
@@ -35,4 +39,16 @@ if __name__ == '__main__':
         ('clf', LogisticRegression(random_state=1)),
     ])
     pipe_lr.fit(X_train, y_train)
-    print("Test accuracy: %.3f" % pipe_lr.score(X_test, y_test))
+    print("Test accuracy: %.3f\n" % pipe_lr.score(X_test, y_test))
+
+    kfold = StratifiedKFold(y=y_train, n_folds=10, random_state=1)
+    scores = []
+    for k, (train, test) in enumerate(kfold):
+        pipe_lr.fit(X_train[train], y_train[train])
+        score = pipe_lr.score(X_train[test], y_train[test])
+        scores.append(score)
+        print(
+            "Fold: %s, Class dist.: %s, Acc: %.3f" %
+            (k+1, np.bincount(y_train[train]), score)
+        )
+    print("\nCV accuracy: %.3f +/- %.3f" % (np.mean(scores), np.std(scores)))
