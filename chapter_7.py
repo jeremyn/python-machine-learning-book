@@ -1,8 +1,10 @@
 from itertools import product
 import math
+import os
 
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 from scipy.misc import comb
 from sklearn import datasets
 from sklearn.base import (
@@ -14,10 +16,12 @@ from sklearn.cross_validation import (
     cross_val_score,
     train_test_split,
 )
+from sklearn.ensemble import BaggingClassifier
 from sklearn.externals import six
 from sklearn.grid_search import GridSearchCV
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import (
+    accuracy_score,
     auc,
     roc_curve,
 )
@@ -65,6 +69,102 @@ def plot_ensemble_error():
     plt.ylabel('Base/Ensemble error')
     plt.legend(loc='upper left')
     plt.grid()
+
+    plt.show()
+
+
+def use_bagging_classifier():
+    df = pd.read_csv(os.path.join('datasets', 'wine.data'), header=None)
+    df.columns = [
+        'Class label', 'Alcohol', 'Malic acid', 'Ash', 'Alcalinity of ash',
+        'Magnesium', 'Total phenols', 'Flavanoids', 'Nonflavanoid phenols',
+        'Proanthocyanins', 'Color intensity', 'Hue',
+        'OD280/OD315 of diluted wines', 'Proline',
+    ]
+    df = df[df['Class label'] != 1]
+    X = df[['Alcohol', 'Hue']].values
+    y = df['Class label'].values
+    label_encoder = LabelEncoder()
+    y = label_encoder.fit_transform(y)
+
+    X_train, X_test, y_train, y_test = train_test_split(
+        X,
+        y,
+        test_size=0.4,
+        random_state=1,
+    )
+
+    tree = DecisionTreeClassifier(
+        criterion='entropy',
+        max_depth=None,
+        random_state=3,
+    )
+    bag = BaggingClassifier(
+        base_estimator=tree,
+        n_estimators=500,
+        max_samples=1.0,
+        max_features=1.0,
+        bootstrap=True,
+        bootstrap_features=False,
+        random_state=1
+    )
+
+    clfs = [tree, bag]
+    labels = ['Decision tree', 'Bagging']
+
+    for clf, label in zip(clfs, labels):
+        clf = clf.fit(X_train, y_train)
+        y_train_pred = clf.predict(X_train)
+        y_test_pred = clf.predict(X_test)
+
+        clf_train = accuracy_score(y_train, y_train_pred)
+        clf_test = accuracy_score(y_test, y_test_pred)
+        print(
+            "%s train/test accuracies %.3f/%.3f" %
+            (label, clf_train, clf_test)
+        )
+
+    x_min = X_train[:, 0].min() - 1
+    x_max = X_train[:, 0].max() + 1
+    y_min = X_train[:, 1].min() - 1
+    y_max = X_train[:, 1].max() + 1
+
+    xx, yy = np.meshgrid(
+        np.arange(x_min, x_max, 0.1),
+        np.arange(y_min, y_max, 0.1),
+    )
+
+    f, axarr = plt.subplots(
+        nrows=1,
+        ncols=2,
+        sharex='col',
+        sharey='row',
+        figsize=(8, 3),
+    )
+
+    for index, clf, tt in zip([0, 1], clfs, labels):
+        clf.fit(X_train, y_train)
+
+        Z = clf.predict(np.c_[xx.ravel(), yy.ravel()])
+        Z = Z.reshape(xx.shape)
+
+        axarr[index].contourf(xx, yy, Z, alpha=0.3)
+        axarr[index].scatter(
+            X_train[y_train == 0, 0],
+            X_train[y_train == 0, 1],
+            c='blue',
+            marker='^',
+        )
+        axarr[index].scatter(
+            X_train[y_train == 1, 0],
+            X_train[y_train == 1, 1],
+            c='red',
+            marker='o',
+        )
+        axarr[index].set_title(tt)
+
+    axarr[0].set_ylabel('Alcohol', fontsize=12)
+    plt.text(9.8, -1, s='Hue', ha='center', va='center', fontsize=12)
 
     plt.show()
 
@@ -300,4 +400,5 @@ class MajorityVoteClassifier(BaseEstimator, ClassifierMixin):
 
 if __name__ == '__main__':
     # plot_ensemble_error()
-    use_majority_vote_classifier()
+    # use_majority_vote_classifier()
+    use_bagging_classifier()
