@@ -16,7 +16,10 @@ from sklearn.cross_validation import (
     cross_val_score,
     train_test_split,
 )
-from sklearn.ensemble import BaggingClassifier
+from sklearn.ensemble import (
+    AdaBoostClassifier,
+    BaggingClassifier,
+)
 from sklearn.externals import six
 from sklearn.grid_search import GridSearchCV
 from sklearn.linear_model import LogisticRegression
@@ -73,7 +76,40 @@ def plot_ensemble_error():
     plt.show()
 
 
+def use_adaboost_classifier():
+    tree = DecisionTreeClassifier(
+        criterion='entropy',
+        max_depth=1,
+        random_state=0,
+    )
+    ada = AdaBoostClassifier(
+        base_estimator=tree,
+        n_estimators=500,
+        learning_rate=0.1,
+        random_state=0,
+    )
+    return use_ensemble_classifier(tree, 'Decision tree', ada, 'AdaBoost')
+
+
 def use_bagging_classifier():
+    tree = DecisionTreeClassifier(
+        criterion='entropy',
+        max_depth=None,
+        random_state=3,
+    )
+    bag = BaggingClassifier(
+        base_estimator=tree,
+        n_estimators=500,
+        max_samples=1.0,
+        max_features=1.0,
+        bootstrap=True,
+        bootstrap_features=False,
+        random_state=1
+    )
+    return use_ensemble_classifier(tree, 'Decision tree', bag, 'Bagging')
+
+
+def use_ensemble_classifier(clf1, label1, clf2, label2):
     df = pd.read_csv(os.path.join('datasets', 'wine.data'), header=None)
     df.columns = [
         'Class label', 'Alcohol', 'Malic acid', 'Ash', 'Alcalinity of ash',
@@ -94,23 +130,8 @@ def use_bagging_classifier():
         random_state=1,
     )
 
-    tree = DecisionTreeClassifier(
-        criterion='entropy',
-        max_depth=None,
-        random_state=3,
-    )
-    bag = BaggingClassifier(
-        base_estimator=tree,
-        n_estimators=500,
-        max_samples=1.0,
-        max_features=1.0,
-        bootstrap=True,
-        bootstrap_features=False,
-        random_state=1
-    )
-
-    clfs = [tree, bag]
-    labels = ['Decision tree', 'Bagging']
+    clfs = [clf1, clf2]
+    labels = [label1, label2]
 
     for clf, label in zip(clfs, labels):
         clf = clf.fit(X_train, y_train)
@@ -401,4 +422,5 @@ class MajorityVoteClassifier(BaseEstimator, ClassifierMixin):
 if __name__ == '__main__':
     # plot_ensemble_error()
     # use_majority_vote_classifier()
-    use_bagging_classifier()
+    # use_bagging_classifier()
+    use_adaboost_classifier()
