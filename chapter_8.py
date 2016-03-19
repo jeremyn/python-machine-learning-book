@@ -7,11 +7,15 @@ import numpy as np
 import pandas as pd
 from sklearn.feature_extraction.text import (
     CountVectorizer,
+    HashingVectorizer,
     TfidfTransformer,
     TfidfVectorizer,
 )
 from sklearn.grid_search import GridSearchCV
-from sklearn.linear_model import LogisticRegression
+from sklearn.linear_model import (
+    LogisticRegression,
+    SGDClassifier,
+)
 from sklearn.pipeline import Pipeline
 
 
@@ -91,6 +95,64 @@ def run_grid_search():
     print("Test accuracy: %.3f" % clf.score(X_test, y_test))
 
 
+def get_minibatch(doc_stream, size):
+    docs = []
+    y = []
+    try:
+        for _ in range(size):
+            text, label = next(doc_stream)
+            docs.append(text)
+            y.append(label)
+    except StopIteration:
+        docs = None
+        y = None
+    return docs, y
+
+
+def stream_docs(path):
+    with open(path, 'r', encoding='utf-8') as csv:
+        next(csv)
+        for line in csv:
+            text = line[:-3]
+            label = int(line[-2])
+            yield text, label
+
+
+def tokenizer_streaming(text):
+    text = preprocessor(text)
+    stop = stopwords.words('english')
+    tokenized = [w for w in text.split() if w not in stop]
+    return tokenized
+
+
+def run_online_classifier():
+    vect = HashingVectorizer(
+        decode_error='ignore',
+        n_features=2**21,
+        preprocessor=None,
+        tokenizer=tokenizer_streaming,
+    )
+    clf = SGDClassifier(loss='log', random_state=1, n_iter=1)
+
+    csv_filename = os.path.join('datasets', 'movie_data.csv')
+    doc_stream = stream_docs(path=csv_filename)
+
+    classes = np.array([0, 1])
+    for _ in range(45):
+        X_train, y_train = get_minibatch(doc_stream, size=1000)
+        if X_train is None:
+            break
+        else:
+            X_train = vect.transform(X_train)
+            clf.partial_fit(X_train, y_train, classes=classes)
+
+    X_test, y_test = get_minibatch(doc_stream, size=5000)
+    X_test = vect.transform(X_test)
+    print("Test accuracy: %.3f" % clf.score(X_test, y_test))
+
+    clf = clf.partial_fit(X_test, y_test)
+
+
 def work_with_simple_bag_of_words():
     count = CountVectorizer()
     docs = np.array([
@@ -123,4 +185,5 @@ def work_with_simple_bag_of_words():
 if __name__ == '__main__':
     np.random.seed(0)
     # work_with_simple_bag_of_words()
-    run_grid_search()
+    # run_grid_search()
+    run_online_classifier()
