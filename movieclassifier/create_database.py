@@ -1,11 +1,14 @@
 import os
 import sqlite3
 
-_DATABASE_FILENAME = 'reviews.sqlite'
+DATABASE_FILENAME = os.path.join(
+    os.path.dirname(__file__),
+    'reviews.sqlite',
+)
 
 
 def check_database():
-    conn = sqlite3.connect(_DATABASE_FILENAME)
+    conn = sqlite3.connect(DATABASE_FILENAME)
     c = conn.cursor()
 
     c.execute('SELECT * FROM review_db')
@@ -16,7 +19,7 @@ def check_database():
 
 
 def create_database():
-    conn = sqlite3.connect(_DATABASE_FILENAME)
+    conn = sqlite3.connect(DATABASE_FILENAME)
     c = conn.cursor()
     c.execute(
         'CREATE TABLE review_db (review TEXT, sentiment INTEGER, date TEXT)'
@@ -40,7 +43,7 @@ def create_database():
 
 if __name__ == '__main__':
     try:
-        os.remove(_DATABASE_FILENAME)
+        os.remove(DATABASE_FILENAME)
     except FileNotFoundError:
         pass
     create_database()

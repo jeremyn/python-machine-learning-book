@@ -12,7 +12,7 @@ _PKL_OBJECTS_DIR = os.path.join(
 if not os.path.exists(_PKL_OBJECTS_DIR):
     os.makedirs(_PKL_OBJECTS_DIR)
 
-_CLF_FILENAME = os.path.join(_PKL_OBJECTS_DIR, 'classifier.pkl')
+CLF_FILENAME = os.path.join(_PKL_OBJECTS_DIR, 'classifier.pkl')
 
 _STOPWORDS_FILENAME = os.path.join(_PKL_OBJECTS_DIR, 'stopwords.pkl')
 
@@ -21,7 +21,7 @@ try:
 except FileNotFoundError:
     from nltk.corpus import stopwords
     stop = stopwords.words('english')
-    pickle.dump(stop, open(_STOPWORDS_FILENAME,'wb'), protocol=4)
+    pickle.dump(stop, open(_STOPWORDS_FILENAME, 'wb'), protocol=4)
 
 
 def _tokenizer(text):
@@ -90,12 +90,12 @@ def train_and_pickle_classifier():
 
     clf = clf.partial_fit(X_test, y_test)
 
-    pickle.dump(clf, open(_CLF_FILENAME, 'wb'), protocol=4)
+    pickle.dump(clf, open(CLF_FILENAME, 'wb'), protocol=4)
 
 
 if __name__ == '__main__':
     import numpy as np
-    clf = pickle.load(open(_CLF_FILENAME, 'rb'))
+    clf = pickle.load(open(CLF_FILENAME, 'rb'))
 
     label = {0: 'negative', 1: 'positive'}
     example = ['I love this movie']
