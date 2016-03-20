@@ -13,6 +13,7 @@ from wtforms import (
 )
 
 from create_database import DATABASE_FILENAME
+from update import update_model
 from vectorizer import (
     CLF_FILENAME,
     vect,
@@ -96,4 +97,5 @@ def feedback():
 
 
 if __name__ == '__main__':
+    update_model(db_path=DATABASE_FILENAME, model=clf)
     app.run(debug=True)
