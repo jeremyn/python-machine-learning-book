@@ -1,2 +1,3 @@
 datasets/
 pkl_objects/
+*.sqlite
