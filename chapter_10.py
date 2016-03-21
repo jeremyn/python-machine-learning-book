@@ -6,6 +6,7 @@ import pandas as pd
 import seaborn as sns
 from sklearn.cross_validation import train_test_split
 from sklearn.linear_model import (
+    Lasso,
     LinearRegression,
     RANSACRegressor,
 )
@@ -177,13 +178,7 @@ def plot_ransac_linear_model(X, y):
     print("Intercept: %.3f" % ransac.estimator_.intercept_)
 
 
-def evaluate_sklearn_linear_regression(X, y):
-    X_train, X_test, y_train, y_test = train_test_split(
-        X,
-        y,
-        test_size=0.3,
-        random_state=0,
-    )
+def evaluate_sklearn_linear_regression(X_train, X_test, y_train, y_test):
     lr = LinearRegression()
     lr.fit(X_train, y_train)
     y_train_pred = lr.predict(X_train)
@@ -221,6 +216,23 @@ def evaluate_sklearn_linear_regression(X, y):
     ))
 
 
+def evaluate_sklearn_lasso_model(X_train, X_test, y_train, y_test):
+    lasso = Lasso(alpha=0.1)
+    lasso.fit(X_train, y_train)
+    y_train_pred = lasso.predict(X_train)
+    y_test_pred = lasso.predict(X_test)
+    print(lasso.coef_)
+
+    print("MSE train: %.3f, test: %.3f" % (
+        mean_squared_error(y_train, y_train_pred),
+        mean_squared_error(y_test, y_test_pred),
+    ))
+    print("R^2 train: %.3f, test: %.3f" % (
+        r2_score(y_train, y_train_pred),
+        r2_score(y_test, y_test_pred),
+    ))
+
+
 if __name__ == '__main__':
     df, X, y = get_housing_data()
     X_rm = df[['RM']].values
@@ -230,4 +242,11 @@ if __name__ == '__main__':
     # plot_sklearn_linear_model(X_rm, y)
     # create_linear_model_with_normal_equation(X_rm, y)
     # plot_ransac_linear_model(X_rm, y)
-    evaluate_sklearn_linear_regression(X, y)
+    X_train, X_test, y_train, y_test = train_test_split(
+        X,
+        y,
+        test_size=0.3,
+        random_state=0,
+    )
+    # evaluate_sklearn_linear_regression(X_train, X_test, y_train, y_test)
+    evaluate_sklearn_lasso_model(X_train, X_test, y_train, y_test)
