@@ -49,8 +49,6 @@ def visualize_housing_data(df):
 
     plt.show()
 
-    sns.reset_orig()
-
 
 class LinearRegressionGD(object):
 
@@ -177,6 +175,7 @@ def plot_ransac_linear_model(X, y):
 if __name__ == '__main__':
     df, X_rm, y = get_housing_data()
     # visualize_housing_data(df)
+    sns.reset_orig()
     # plot_custom_linear_model(X_rm, y)
     # plot_sklearn_linear_model(X_rm, y)
     # create_linear_model_with_normal_equation(X_rm, y)
