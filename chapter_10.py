@@ -123,8 +123,16 @@ def plot_sklearn_linear_model(X, y):
     plt.show()
 
 
+def create_linear_model_with_normal_equation(X, y):
+    X = np.hstack((np.ones((X.shape[0], 1)), X))
+    w = np.linalg.inv(np.dot(X.T, X)).dot(X.T).dot(y)
+    print("Slope: %.3f" % w[1])
+    print("Intercept: %.3f" % w[0])
+
+
 if __name__ == '__main__':
     df, X_rm, y = get_housing_data()
     # visualize_housing_data(df)
     # plot_custom_linear_model(X_rm, y)
-    plot_sklearn_linear_model(X_rm, y)
+    # plot_sklearn_linear_model(X_rm, y)
+    create_linear_model_with_normal_equation(X_rm, y)
