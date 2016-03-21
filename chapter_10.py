@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
+from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import StandardScaler
 
 
@@ -109,7 +110,21 @@ def plot_custom_linear_model(X, y):
     print("Price in $1000's: %.3f" % sc_y.inverse_transform(price_std))
 
 
+def plot_sklearn_linear_model(X, y):
+    sklearn_lr = LinearRegression()
+    sklearn_lr.fit(X, y)
+    print("Slope: %.3f" % sklearn_lr.coef_[0])
+    print("Intercept: %.3f" % sklearn_lr.intercept_)
+
+    lin_regplot(X, y, sklearn_lr)
+    plt.xlabel('Average number of rooms [RM]')
+    plt.ylabel("Price in $1000's [MEDV]")
+
+    plt.show()
+
+
 if __name__ == '__main__':
     df, X_rm, y = get_housing_data()
     # visualize_housing_data(df)
-    plot_custom_linear_model(X_rm, y)
+    # plot_custom_linear_model(X_rm, y)
+    plot_sklearn_linear_model(X_rm, y)
