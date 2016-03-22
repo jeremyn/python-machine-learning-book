@@ -1,7 +1,19 @@
 from matplotlib import cm
 import matplotlib.pyplot as plt
 import numpy as np
-from sklearn.cluster import KMeans
+import pandas as pd
+from scipy.cluster.hierarchy import (
+    dendrogram,
+    linkage,
+)
+from scipy.spatial.distance import (
+    pdist,
+    squareform,
+)
+from sklearn.cluster import (
+    AgglomerativeClustering,
+    KMeans,
+)
 from sklearn.datasets import make_blobs
 from sklearn.metrics import silhouette_samples
 
@@ -150,6 +162,81 @@ def plot_blob_data(X):
     plot_silhouettes(X, y_km)
 
 
+def process_random_data():
+    variables = ['X', 'Y', 'Z']
+    labels = ["ID_%s" % i for i in range(5)]
+    X = np.random.random_sample([5, 3])*10
+    df = pd.DataFrame(X, columns=variables, index=labels)
+    print(df, end='\n\n')
+
+    row_dist = pd.DataFrame(
+        squareform(pdist(df, metric='euclidean')),
+        columns=labels,
+        index=labels,
+    )
+
+    row_clusters_options = (
+        linkage(row_dist, method='complete', metric='euclidean'),  # bad
+        linkage(pdist(df, metric='euclidean'), method='complete'),  # good
+        linkage(df.values, method='complete', metric='euclidean'),  # good
+    )
+
+    columns = (
+        'row label 1',
+        'row label 2',
+        'distance',
+        'no. of items in clust.',
+    )
+    for row_clusters_option in row_clusters_options:
+        index = [
+            "cluster %d" % (i+1) for i in range(row_clusters_option.shape[0])
+        ]
+        print(
+            pd.DataFrame(
+                row_clusters_option,
+                columns=columns,
+                index=index,
+            ),
+            end='\n\n',
+        )
+
+    row_clusters = row_clusters_options[2]
+
+    dendrogram(row_clusters, labels=labels)
+    plt.ylabel('Euclidean distance')
+
+    plt.show()
+
+    fig = plt.figure(figsize=(8, 8), facecolor='white')
+    axd = fig.add_axes([0.09, 0.1, 0.2, 0.6])
+    row_dendr = dendrogram(row_clusters, orientation='left')
+
+    df_rowclust = df.ix[row_dendr['leaves'][::-1]]
+
+    axd.set_xticks([])
+    axd.set_yticks([])
+    for i in axd.spines.values():
+        i.set_visible(False)
+
+    axm = fig.add_axes([0.23, 0.1, 0.6, 0.6])
+    cax = axm.matshow(df_rowclust, interpolation='nearest', cmap='hot_r')
+    fig.colorbar(cax)
+    axm.set_xticklabels([''] + list(df_rowclust.columns))
+    axm.set_yticklabels([''] + list(df_rowclust.index))
+
+    plt.show()
+
+    ac = AgglomerativeClustering(
+        n_clusters=2,
+        affinity='euclidean',
+        linkage='complete',
+    )
+    labels = ac.fit_predict(X)
+    print("Cluster labels: %s" % labels)
+
+
 if __name__ == '__main__':
     X_blob, y_blob = get_blob_data()
-    plot_blob_data(X_blob)
+    # plot_blob_data(X_blob)
+    np.random.seed(123)
+    process_random_data()
