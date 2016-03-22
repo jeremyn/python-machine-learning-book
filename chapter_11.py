@@ -74,6 +74,25 @@ def plot_blob_data(X):
     plt.grid()
     plt.show()
 
+    print("Distortion: %.2f" % km.inertia_)
+
+    distortions = []
+    for i in range(1, 11):
+        km = KMeans(
+            n_clusters=i,
+            init='k-means++',
+            n_init=10,
+            max_iter=300,
+            random_state=0,
+        )
+        km.fit(X)
+        distortions.append(km.inertia_)
+    plt.plot(range(1, 11), distortions, marker='o')
+    plt.xlabel('Number of clusters')
+    plt.ylabel('Distortion')
+
+    plt.show()
+
 
 if __name__ == '__main__':
     X_blob, y_blob = get_blob_data()
