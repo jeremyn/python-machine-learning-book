@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 from sklearn.cross_validation import train_test_split
+from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import (
     Lasso,
     LinearRegression,
@@ -371,6 +372,53 @@ def evaluate_decision_tree_regression(X, y):
     plt.show()
 
 
+def evaluate_random_forest_regression(X_train, X_test, y_train, y_test):
+    forest = RandomForestRegressor(
+        n_estimators=1000,
+        criterion='mse',
+        random_state=1,
+    )
+    forest.fit(X_train, y_train)
+    y_train_pred = forest.predict(X_train)
+    y_test_pred = forest.predict(X_test)
+
+    print("MSE train: %.3f, test: %.3f" % (
+        mean_squared_error(y_train, y_train_pred),
+        mean_squared_error(y_test, y_test_pred),
+    ))
+    print("R^2 train: %.3f, test: %.3f" % (
+        r2_score(y_train, y_train_pred),
+        r2_score(y_test, y_test_pred),
+    ))
+
+    plt.scatter(
+        y_train_pred,
+        y_train_pred - y_train,
+        c='black',
+        marker='o',
+        s=35,
+        alpha=0.5,
+        label='Training data',
+    )
+    plt.scatter(
+        y_test_pred,
+        y_test_pred - y_test,
+        c='lightgreen',
+        marker='s',
+        s=35,
+        alpha=0.7,
+        label='Test data',
+    )
+
+    plt.xlabel('Predicted values')
+    plt.ylabel('Residuals')
+    plt.legend(loc='upper left')
+    plt.hlines(y=0, xmin=-10, xmax=50, lw=2, color='red')
+    plt.xlim([-10, 50])
+
+    plt.show()
+
+
 if __name__ == '__main__':
     df, X, y = get_housing_data()
     X_rm = df[['RM']].values
@@ -391,4 +439,11 @@ if __name__ == '__main__':
     # evaluate_simple_polynomial_regression_model()
     X_lstat = df[['LSTAT']].values
     # evaluate_housing_polynomial_models(X_lstat, y)
-    evaluate_decision_tree_regression(X_lstat, y)
+    # evaluate_decision_tree_regression(X_lstat, y)
+    X_train, X_test, y_train, y_test = train_test_split(
+        X,
+        y,
+        test_size=0.4,
+        random_state=1,
+    )
+    evaluate_random_forest_regression(X_train, X_test, y_train, y_test)
