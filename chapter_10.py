@@ -18,6 +18,7 @@ from sklearn.preprocessing import (
     PolynomialFeatures,
     StandardScaler,
 )
+from sklearn.tree import DecisionTreeRegressor
 
 
 def get_housing_data():
@@ -357,6 +358,19 @@ def evaluate_housing_polynomial_models(X, y):
     plt.show()
 
 
+def evaluate_decision_tree_regression(X, y):
+    tree = DecisionTreeRegressor(max_depth=3)
+    tree.fit(X, y)
+
+    sort_index = X.flatten().argsort()
+
+    lin_regplot(X[sort_index], y[sort_index], tree)
+    plt.xlabel('% lower status of the population [LSTAT]')
+    plt.ylabel("Price in $1000's [MEDV]")
+
+    plt.show()
+
+
 if __name__ == '__main__':
     df, X, y = get_housing_data()
     X_rm = df[['RM']].values
@@ -376,4 +390,5 @@ if __name__ == '__main__':
     # evaluate_sklearn_lasso_model(X_train, X_test, y_train, y_test)
     # evaluate_simple_polynomial_regression_model()
     X_lstat = df[['LSTAT']].values
-    evaluate_housing_polynomial_models(X_lstat, y)
+    # evaluate_housing_polynomial_models(X_lstat, y)
+    evaluate_decision_tree_regression(X_lstat, y)
