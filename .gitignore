@@ -1,3 +1,4 @@
 datasets/
 pkl_objects/
 *.sqlite
+nn_mnist.pkl
