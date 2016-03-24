@@ -1,3 +1,8 @@
+# Copyright Jeremy Nation.
+# Released under the MIT license. See included LICENSE.txt.
+#
+# Almost entirely copied from code created by Sebastian Raschka released under
+# the MIT license. See included LICENSE.raschka.txt.
 from flask import (
     Flask,
     render_template,
