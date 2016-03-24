@@ -7,7 +7,7 @@ import numpy as np
 from scipy.special import expit
 
 
-NN__MNIST_FILENAME = 'nn_mnist.pkl'
+NN_MNIST_FILENAME = 'nn_mnist.pkl'
 
 
 def get_mnist_data():
@@ -485,7 +485,7 @@ class NeuralNetMLP(object):
 def get_trained_nn(X_train, y_train):
     np.random.seed(1)
     try:
-        nn = pickle.load(open(NN__MNIST_FILENAME, 'rb'))
+        nn = pickle.load(open(NN_MNIST_FILENAME, 'rb'))
     except FileNotFoundError:
         nn = NeuralNetMLP(
             n_output=10,
@@ -502,7 +502,7 @@ def get_trained_nn(X_train, y_train):
             random_state=1,
         )
         nn.fit(X_train, y_train, print_progress=True)
-        pickle.dump(nn, open(NN__MNIST_FILENAME, 'wb'), protocol=4)
+        pickle.dump(nn, open(NN_MNIST_FILENAME, 'wb'), protocol=4)
 
     return nn
 
