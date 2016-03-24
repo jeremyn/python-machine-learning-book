@@ -1,3 +1,9 @@
+import os
+
+from keras.layers.core import Dense
+from keras.models import Sequential
+from keras.optimizers import SGD
+from keras.utils import np_utils
 import matplotlib.pyplot as plt
 import numpy as np
 import theano
@@ -193,7 +199,91 @@ def work_with_activation_functions():
     plt.show()
 
 
+def get_mnist_data():
+    path = os.path.join('datasets', 'mnist')
+    mnist_data = []
+    for kind in ('train', 't10k'):
+        labels_path = os.path.join(path, "%s-labels-idx1-ubyte" % kind)
+        images_path = os.path.join(path, "%s-images-idx3-ubyte" % kind)
+
+        with open(labels_path, 'rb') as lbpath:
+            lbpath.seek(8)
+            mnist_data.append(np.fromfile(lbpath, dtype=np.uint8))
+
+        with open(images_path, 'rb') as imgpath:
+            imgpath.seek(16)
+            mnist_data.append(
+                np.fromfile(
+                    imgpath,
+                    dtype=np.uint8,
+                ).reshape(len(mnist_data[-1]), 784)
+            )
+
+    y_train, X_train, y_test, X_test = mnist_data
+    print(
+        "Train: rows: %d, columns: %d" % (X_train.shape[0], X_train.shape[1])
+    )
+    print("Test: rows: %d, columns: %d" % (X_test.shape[0], X_test.shape[1]))
+    return X_train, X_test, y_train, y_test
+
+
+def evaluate_keras_classification_model(X_train, X_test, y_train, y_test):
+    X_train = X_train.astype(theano.config.floatX)
+    X_test = X_test.astype(theano.config.floatX)
+
+    print("First 3 labels: %s" % y_train[:3])
+
+    y_train_ohe = np_utils.to_categorical(y_train)
+    print('\nFirst 3 labels (one-hot):\n', y_train_ohe[:3])
+
+    model = Sequential()
+    model.add(Dense(
+        input_dim=X_train.shape[1],
+        output_dim=50,
+        init='uniform',
+        activation='tanh',
+    ))
+    model.add(Dense(
+        input_dim=50,
+        output_dim=50,
+        init='uniform',
+        activation='tanh',
+    ))
+    model.add(Dense(
+        input_dim=50,
+        output_dim=y_train_ohe.shape[1],
+        init='uniform',
+        activation='softmax',
+    ))
+
+    sgd = SGD(lr=0.001, decay=1e-7, momentum=0.9)
+    model.compile(loss='categorical_crossentropy', optimizer=sgd)
+
+    model.fit(
+        X_train,
+        y_train_ohe,
+        nb_epoch=5,
+        batch_size=300,
+        verbose=1,
+        validation_split=0.1,
+        show_accuracy=True,
+    )
+
+    y_train_pred = model.predict_classes(X_train, verbose=0)
+    print('First 3 predictions: ', y_train_pred[:3])
+
+    train_acc = np.sum(y_train == y_train_pred, axis=0) / X_train.shape[0]
+    print("Training accuracy: %.2f%%" % (train_acc * 100))
+
+    y_test_pred = model.predict_classes(X_test, verbose=0)
+    test_acc = np.sum(y_test == y_test_pred, axis=0) / X_test.shape[0]
+    print("Test accuracy: %.2f%%" % (test_acc * 100))
+
+
 if __name__ == '__main__':
     # do_simple_theano_calculations()
     # plot_theano_linear_regression()
-    work_with_activation_functions()
+    # work_with_activation_functions()
+    X_train, X_test, y_train, y_test = get_mnist_data()
+    np.random.seed(1)
+    evaluate_keras_classification_model(X_train, X_test, y_train, y_test)
