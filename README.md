@@ -1,12 +1,14 @@
 # Working Environment for *Python Machine Learning*
 
+(Note: this repository is based on the first edition of *Python Machine Learning*, including the link to the book below. If you want to buy this book, I encourage you to go to the author's personal website, linked below, and from there find the most recent edition.)
+
 This repository is a place for me to use and experiment with code from Sebastian Raschka's book *Python Machine Learning*. Any given code in here might be directly from the book, or entirely mine, or a mix.
 
 I absolutely do not want to take credit for anything created by the book's author. Here are some links to learn more about the book, the author, and to see code for the book directly from the book's author:
 
 * [Book at PacktPub](https://www.packtpub.com/big-data-and-business-intelligence/python-machine-learning) (the book's publisher)
 
-* [Home page for Sebastian Raschka](http://sebastianraschka.com) (the book's author)
+* [Home page for Sebastian Raschka](https://sebastianraschka.com) (the book's author)
 
 * [Author's code for the book on GitHub](https://github.com/rasbt/python-machine-learning-book)
 
