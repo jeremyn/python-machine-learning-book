@@ -1,7 +1,7 @@
 # WARNING! Some of these packages have known security problems. Please see the
 # accompanying README.
 cycler==0.10.0
-Flask==0.10.1
+Flask==1.0
 itsdangerous==0.24
 Jinja2==2.8
 Keras==0.3.2
