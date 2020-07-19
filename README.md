@@ -16,7 +16,9 @@ If you want to include or redistribute anything from this repository in your own
 
 ## Requirements
 
-The code in this repository should work with Python 3.5.1 and the dependencies in the included `requirements.txt`.
+~~The code in this repository should work with Python 3.5.1 and the dependencies in the included `requirements.txt`.~~
+
+Security problems have been found in some of the original dependencies. I don't care to actively maintain this repository, so please consider this code read-only. I've renamed `requirements.txt` to `INSECURE.requirements` to make the problem clear while keeping the package list available.
 
 ## Datasets
 
