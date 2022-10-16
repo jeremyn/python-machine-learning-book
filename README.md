@@ -1,5 +1,9 @@
 # Working Environment for *Python Machine Learning*
 
+By: [Jeremy Nation](mailto:jeremy@jeremynation.me).
+
+## Summary
+
 (Note: this repository is based on the first edition of *Python Machine Learning*, including the link to the book below. If you want to buy this book, I encourage you to go to the author's personal website, linked below, and from there find the most recent edition.)
 
 This repository is a place for me to use and experiment with code from Sebastian Raschka's book *Python Machine Learning*. Any given code in here might be directly from the book, or entirely mine, or a mix.
@@ -28,4 +32,6 @@ By default, the code expects these data files to be in a `datasets` directory (a
 
 ## License
 
-The book's author [has released his code under the MIT license](https://github.com/rasbt/python-machine-learning-book/blob/f07bacb9f678964ea0d79b2b0f8c66372b59ed77/LICENSE.txt), included here as `LICENSE.raschka.txt`. My own code and modifications are also released under the MIT license, included here as `LICENSE.txt`.
+Copyright [Jeremy Nation](mailto:jeremy@jeremynation.me).
+
+The book's author [has released his code under the MIT license](https://github.com/rasbt/python-machine-learning-book/blob/f07bacb9f678964ea0d79b2b0f8c66372b59ed77/LICENSE.txt), included here as [`LICENSE.raschka`](LICENSE.raschka). My own code and modifications are also released under the MIT license, included here as [`LICENSE`](LICENSE).

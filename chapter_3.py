@@ -1,8 +1,10 @@
-# Copyright Jeremy Nation.
-# Released under the MIT license. See included LICENSE.txt.
-#
-# Almost entirely copied from code created by Sebastian Raschka released under
-# the MIT license. See included LICENSE.raschka.txt.
+"""
+Copyright Jeremy Nation <jeremy@jeremynation.me>.
+Licensed under the MIT license.
+
+Almost entirely copied from code created by Sebastian Raschka, also licensed under the MIT license.
+
+"""
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.cross_validation import train_test_split
